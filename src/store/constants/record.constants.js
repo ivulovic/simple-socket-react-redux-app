@@ -1,0 +1,4 @@
+export const ADD_RECORD = "ADD_RECORD";
+export const RECORD_RECEIVED = "RECORD_RECEIVED";
+export const LOAD_RECORDS = "LOAD_RECORDS";
+export const DEFINE_RECORD = "DEFINE_RECORD";

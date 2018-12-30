@@ -1,28 +1,60 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {Route, Switch, BrowserRouter} from "react-router-dom";
+import { browserHistory } from 'react-dom';
+import {Menu, GuardRoute, NotFound} from "./components";
+import Profile from "./containers/Profile";
+import Records from "./containers/Records";
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+
+import {connect} from "react-redux";
+import * as AuthActions from "./store/actions/auth.actions";
+
 
 class App extends Component {
+
+  componentDidMount(){
+    if(localStorage.getItem('fakeUserLoggedIn')){
+      this.props.login();
+    }
+  }
+
+  isLoggedIn(){
+    return this.props.auth.loggedIn || localStorage.getItem('fakeUserLoggedIn');
+  }
+
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
+      <MuiThemeProvider>
+        <div>
+          <BrowserRouter history={browserHistory}>
+            <div>
+              <Menu onLogin={this.props.login} loggedIn={this.props.auth.loggedIn}/>
+              <Switch>
+                <Route exact path="/" component={Records}/>
+                 <GuardRoute guard={this.isLoggedIn()} path="/profile" component={Profile}/>
+                <Route component={NotFound} />
+              </Switch>
+            </div>
+          </BrowserRouter>
+        </div>
+      </MuiThemeProvider>
     );
   }
 }
 
-export default App;
+const mapStateToProps = (state) => {
+  return {
+    auth: state.auth
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    login: () => {
+      dispatch(AuthActions.login());
+    }
+  }
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
+
